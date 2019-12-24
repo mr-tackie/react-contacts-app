@@ -5,7 +5,8 @@
 }
 
 body{
-  background-color: #dddddd;
+  background-color: #eeeeee;
+  overflow: hidden;
 }
 
 .main-container{

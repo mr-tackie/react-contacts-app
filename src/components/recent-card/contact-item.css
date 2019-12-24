@@ -1,0 +1,51 @@
+.contact-details-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-bottom: 8px;
+    padding-top: 16px;
+    cursor: pointer
+}
+
+.contact-details-container:hover{
+    background-color: #fafafa;
+}
+
+.contact-details{
+    display: flex;
+    align-items: center;
+}
+
+.contact-name{
+    margin-left: 12px;
+    display: inline-block;
+}
+
+.contact-name__name{
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.contact-name__email{
+    color: #aaaaaa;
+}
+
+.divider
+{
+	position: relative;
+	height: 1px;
+}
+
+.div-transparent:before
+{
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 5%;
+	right: 5%;
+	width: 90%;
+	height: 1px;
+	background-image: linear-gradient(to right, transparent, rgb(230,230,230), transparent);
+}

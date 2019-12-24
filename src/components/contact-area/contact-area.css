@@ -1,0 +1,19 @@
+.main-content-header{
+    height: 100px;
+    padding: 20px;
+    background-color: #dddddd;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.main-content-header-title{
+    margin: 0!important;
+}
+
+.main-content-header-items{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}

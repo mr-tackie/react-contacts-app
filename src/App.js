@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
-import { Row, Col } from 'antd';
+import { Row, Col, Empty } from 'antd';
 import Sidebar from './components/sidebar/sidebar';
+import ContactArea from './components/contact-area/contact-area';
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
           <Sidebar/>
         </Col>
         <Col span={16}>
-          body comes here
+          <ContactArea/>
         </Col>
       </Row>
     </div>

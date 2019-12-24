@@ -1,7 +1,39 @@
 .sidebar-container{
     min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow-x: auto;
     background-color: #ffffff;
     padding: 24px;
+}
+
+.user-details-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.user-details{
+    display: flex;
+    align-items: center;
+}
+
+.header-name{
+    margin-left: 12px;
+    display: inline-block;
+}
+
+.header-name__name{
+    margin: 0!important;
+}
+
+.header-name__email{
+    color: #aaaaaa;
+}
+
+.recents{
+    margin-top: 30px;
+}
+
+.contacts{
+    margin-top: 16px;
 }

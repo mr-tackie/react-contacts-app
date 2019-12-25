@@ -13,7 +13,7 @@ const ContactItem: React.FC<{
       <Row>
         <Col span={24} className="contact-details-container">
           <div className="contact-details">
-            <LetterAvatar name="John Doe"/>
+            <LetterAvatar name={name}/>
             <div className="contact-name">
               <Text className="contact-name__name">
                 {name}

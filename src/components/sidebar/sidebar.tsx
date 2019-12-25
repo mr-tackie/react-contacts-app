@@ -1,37 +1,35 @@
 import React from "react";
 import "./sidebar.css";
-import { Row, Col, Typography, Input, Tabs, Empty } from "antd";
+import { Row, Col, Typography, Input, Tabs, Empty, Skeleton, Alert } from "antd";
 import LetterAvatar from "../letter-avatar/letter-avatar";
 import IconButton from "../icon-button/icon-button";
 import ContactItem from "../contact-item/contact-item";
-const { Title, Text, Paragraph } = Typography;
+import {useQuery} from 'react-apollo';
+import { GET_CONTACTS_QUERY } from "../../queries";
+import { Contact } from "../../models/contact";
+const { Title, Text } = Typography;
 const { Search } = Input;
 const { TabPane } = Tabs;
 
 const Sidebar: React.FC = () => {
-  const contacts : {name: string, email: string}[] = [{
-      name: 'James Annor',
-      email: 'jamesannor@gmail.com',
-  },{
-    name: 'James Annor',
-    email: 'jamesannor@gmail.com',
-},{
-    name: 'James Annor',
-    email: 'jamesannor@gmail.com',
-},{
-    name: 'James Annor',
-    email: 'jamesannor@gmail.com',
-},{
-    name: 'James Annor',
-    email: 'jamesannor@gmail.com',
-},{
-    name: 'James Annor',
-    email: 'jamesannor@gmail.com',
-},{
-    name: 'James Annor',
-    email: 'jamesannor@gmail.com',
-},]
+  const {data, loading, error} = useQuery(GET_CONTACTS_QUERY);
 
+  const handleLoadingState = () => {
+      if(loading){
+        return <Skeleton avatar paragraph={{rows: 1}}/> 
+      }else if(!loading && data){
+          console.log(data);
+          if(data.length === 0){
+              return <Empty/>
+          }else{
+              return data.contacts.map((item: Contact) => {
+                  return <ContactItem key={item.id} name={item.first_name+' '+item.last_name} email={item.emails[0].email}/>
+              })
+          }
+      }else if(error){
+        return <Alert message="There was a problem fetching contacts" type="error" />
+      }
+  }
   return (
     <div className="sidebar-container">
       <Row>
@@ -53,9 +51,9 @@ const Sidebar: React.FC = () => {
           <TabPane tab="Contacts" key="1">
             <Search placeholder="Type a name to search for a contact" />
             <div className="contacts">
-                {contacts.length > 0 ? contacts.map((item, index) => (
-                    <ContactItem name={item.name} email={item.email} key={index}/>
-                )) : <Empty description="No contacts available"/>}
+                {
+                handleLoadingState()
+                }
             </div>
           </TabPane>
           <TabPane tab="Favorites" key="2">

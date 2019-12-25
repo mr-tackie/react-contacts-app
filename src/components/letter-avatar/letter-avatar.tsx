@@ -7,7 +7,8 @@ const LetterAvatar : React.FC<{
     size?: any,
     color?: string
 }> = ({name, size, color}) => {
-    name = name.split(' ').map(word => word.charAt(0)).join('');
+    const letters: string[] = name.split(' ').map(word => word.charAt(0));
+    name = `${letters[0]}${letters.length > 1 ? letters[letters.length - 1] : ''}`
     const colors: string[] = ['#03A9F4', '#E91E63', '#F44336', '#9C27B0', '#673AB7', '#3F51B5'];
     const selected_color = color == null ? colors[Math.floor(Math.random() * colors.length)] : color;
 

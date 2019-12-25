@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { Row, Col, Empty } from 'antd';
+import { Row, Col } from 'antd';
 import Sidebar from './components/sidebar/sidebar';
 import ContactArea from './components/contact-area/contact-area';
 

@@ -17,3 +17,47 @@
     width: 100%;
     justify-content: space-between;
 }
+
+.main-content-body{
+    padding: 20px;
+}
+
+.main-content-contact-details{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.main-content-contact-name{
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.main-content-contact-details span{
+    display: block;
+ }
+
+ .custom-input-field label{
+     font-weight: 600;
+     font-size: 12px;
+     display: block;
+     margin-bottom: 4px;
+ }
+
+ .custom-input{
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #888888;
+    outline: none;
+    border-radius: 0;
+}
+
+.save-button{
+    float: right;
+    margin-top: 16px;
+}

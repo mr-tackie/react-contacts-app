@@ -8,10 +8,10 @@ function App() {
   return (
     <div className="App">
       <Row>
-        <Col span={8}>
+        <Col span={6}>
           <Sidebar/>
         </Col>
-        <Col span={16}>
+        <Col span={18}>
           <ContactArea/>
         </Col>
       </Row>

@@ -3,7 +3,7 @@ import "./sidebar.css";
 import { Row, Col, Typography, Input, Tabs, Empty } from "antd";
 import LetterAvatar from "../letter-avatar/letter-avatar";
 import IconButton from "../icon-button/icon-button";
-import ContactItem from "../recent-card/contact-item";
+import ContactItem from "../contact-item/contact-item";
 const { Title, Text, Paragraph } = Typography;
 const { Search } = Input;
 const { TabPane } = Tabs;

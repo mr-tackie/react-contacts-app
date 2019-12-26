@@ -17,3 +17,11 @@ query getMyContacts{
     }
 }
 `;
+
+export const UPDATE_CONTACT: DocumentNode = gql`
+mutation updateUser($id: Int!, $first_name: String!, $last_name: String! $twitter: String){
+    update_contacts(where: {id: {_eq: $id}}, _set: {first_name: $first_name, last_name: $last_name, twitter: $twitter}){
+        affected_rows
+    }
+}
+`;

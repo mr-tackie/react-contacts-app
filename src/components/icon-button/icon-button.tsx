@@ -6,13 +6,14 @@ const IconButton : React.FC<{
     icon: string,
     color?: string,
     hoverColor?: string,
-}> = ({icon, color, hoverColor,}) => {
+    onClick?: Function
+}> = ({icon, color, onClick}) => {
     return (
-        <div className="icon-button">
+        <button className="icon-button" onClick={onClick ? () => {onClick()} : () => {}}>
             <Icon type={icon} style={{
                 color
             }}/>
-        </div>
+        </button>
     )
 }
 

@@ -1,30 +1,37 @@
 import React from "react";
 import { Row, Col, Typography } from "antd";
 import LetterAvatar from "../letter-avatar/letter-avatar";
-import './contact-item.css'
+import "./contact-item.css";
+import { Contact } from "../../models/contact";
+import SelectedContactContext from "../context/selected-contact.contexts";
+import { getRandomColor } from "../../helpers";
 const { Text } = Typography;
 
 const ContactItem: React.FC<{
-  name: string;
-  email: string;
-}> = ({ name, email }) => {
+  contact: Contact;
+}> = ({ contact, }) => {
+  const { first_name, last_name, emails } = contact;
   return (
-    <div>
-      <Row>
-        <Col span={24} className="contact-details-container">
-          <div className="contact-details">
-            <LetterAvatar name={name}/>
-            <div className="contact-name">
-              <Text className="contact-name__name">
-                {name}
-              </Text>
-              <Text className="contact-name__email">{email}</Text>
-            </div>
-          </div>
-        </Col>
-      </Row>
-      <div className="divider div-transparent"></div>
-    </div>
+    <SelectedContactContext.Consumer>
+      {context => (
+        <div onClick={() => {context.setContact(contact)}}>
+          <Row>
+            <Col span={24} className={`contact-details-container`}>
+              <div className="contact-details">
+                <LetterAvatar name={first_name + " " + last_name}  color="#999999"/>
+                <div className="contact-name">
+                  <Text className="contact-name__name">
+                    {first_name} {last_name}
+                  </Text>
+                  <Text className="contact-name__email">{emails[0].email}</Text>
+                </div>
+              </div>
+            </Col>
+          </Row>
+          <div className="divider div-transparent"></div>
+        </div>
+      )}
+    </SelectedContactContext.Consumer>
   );
 };
 

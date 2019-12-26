@@ -12,6 +12,9 @@
     background-color: #fafafa;
 }
 
+.contact-details-container .active{
+    background-color:black;
+}
 .contact-details{
     display: flex;
     align-items: center;
@@ -31,6 +34,7 @@
 .contact-name__email{
     color: #aaaaaa;
 }
+
 
 .divider
 {

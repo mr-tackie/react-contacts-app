@@ -5,23 +5,21 @@ import {
   Row,
   Typography,
   Col,
-  Popover,
-  Avatar,
   Card,
   Icon,
   Input,
   Button,
   notification
 } from "antd";
-import IconButton from "../icon-button/icon-button";
 import SelectedContactContext from "../context/selected-contact.contexts";
-import { useMutation } from "react-apollo";
-import { UPDATE_CONTACT, GET_CONTACTS_QUERY } from "../../queries";
-import { Contact } from "../../models/contact";
+import { useMutation, useQuery } from "react-apollo";
+import { UPDATE_CONTACT, GET_CONTACTS_QUERY, GET_TWITTER } from "../../queries";
+import { Contact } from "../../models/interfaces";
 import ContactsContext from "../context/contacts.context";
 import ContactHeader from "../contact-header/contact-header";
 import ContactCard from "../contact-card/contact-card";
-const { Title, Text, Paragraph } = Typography;
+import ContactForm from "../contact-form/contact-form";
+const { Title, Paragraph } = Typography;
 
 const ContactArea: React.FC = () => {
   const { selectedContact, setContact } = useContext(SelectedContactContext);
@@ -31,19 +29,29 @@ const ContactArea: React.FC = () => {
   //created local state to check if there was a change in data
   const [hasChanged, setHasChanged] = useState(false);
   const [trackedState, setTrackedState] = useState();
+  const [twitterLink, setTwitterLink] = useState();
 
   //mutation to update contact information
-  const [updateUserMutation, { error, loading, data }] = useMutation(
-    UPDATE_CONTACT
-  );
+  const [updateUserMutation, { loading }] = useMutation(UPDATE_CONTACT);
 
   let unTrackedState: Contact | undefined;
+
+  const query = useQuery(GET_TWITTER, {
+    variables: {
+      username: selectedContact ? selectedContact.twitter : null
+    }
+  });
 
   useEffect(() => {
     if (selectedContact) {
       setTrackedState({ ...selectedContact });
     }
-  }, [selectedContact]);
+
+    if (query.data) {
+      setTwitterLink(query.data.get_twitter);
+      console.log(query.data);
+    }
+  }, [selectedContact, query]);
 
   if (selectedContact) {
     unTrackedState = _.find(contacts, ["id", selectedContact?.id]);
@@ -73,7 +81,7 @@ const ContactArea: React.FC = () => {
 
   //reset input to original data
   const reset = () => {
-    setContact(_.find(contacts, ["id", trackedState?.id]));
+    setTrackedState(_.find(contacts, ["id", trackedState?.id]));
     setHasChanged(false);
   };
 
@@ -125,14 +133,17 @@ const ContactArea: React.FC = () => {
   const renderItems = () => {
     return (
       <div>
-        <ContactHeader />
+        <ContactHeader twitterLink={twitterLink} />
         <div className="main-content-body">
           {selectedContact && trackedState ? (
             <div>
               <Row gutter={20}>
                 <Col span={8}>
                   <Title level={4}>Contact Info</Title>
-                  <ContactCard selectedContact = {selectedContact}/>
+                  <ContactCard
+                    selectedContact={selectedContact}
+                    twitterLink={twitterLink}
+                  />
                 </Col>
                 <Col span={16}>
                   <Title level={4}>Edit details</Title>
@@ -230,47 +241,7 @@ const ContactArea: React.FC = () => {
               </Row>
             </div>
           ) : (
-            <div>
-              <Row>
-                <Col span={18}>
-                  <Card title="Fill this form to add a contact">
-                    <Row gutter={20}>
-                      <Col span={8} className="custom-input-field">
-                        <label>First name</label>
-                        <Input className="custom-input" />
-                      </Col>
-                      <Col span={8} className="custom-input-field mb-3">
-                        <label>Last name</label>
-                        <Input className="custom-input" />
-                      </Col>
-                      <Col span={8} className="custom-input-field">
-                        <label>Twitter</label>
-                        <Input className="custom-input" />
-                      </Col>
-                    </Row>
-                    <Row gutter={20}>
-                      <Col span={12} className="custom-input-field">
-                        <label>Phone Numbers</label>
-                        <Input className="custom-input" />
-                        <Text type="secondary">
-                          <i>(Seperate multiple numbers with a comma)</i>
-                        </Text>
-                      </Col>
-                      <Col span={12} className="custom-input-field">
-                        <label>Emails</label>
-                        <Input className="custom-input" />
-                        <Text type="secondary">
-                          <i>(Seperate multiple emails with a comma)</i>
-                        </Text>
-                      </Col>
-                    </Row>
-                    <Button type="primary" className="save-button">
-                      Save
-                    </Button>
-                  </Card>
-                </Col>
-              </Row>
-            </div>
+            <ContactForm />
           )}
         </div>
       </div>

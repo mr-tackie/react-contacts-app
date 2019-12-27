@@ -1,5 +1,5 @@
 import React from "react";
-import { Contact } from "../../models/contact";
+import { Contact } from "../../models/interfaces";
 import SelectedContactContext from "./selected-contact.contexts";
 
 class ContactContext extends React.Component {

@@ -2,9 +2,8 @@ import React from "react";
 import { Row, Col, Typography } from "antd";
 import LetterAvatar from "../letter-avatar/letter-avatar";
 import "./contact-item.css";
-import { Contact } from "../../models/contact";
+import { Contact } from "../../models/interfaces";
 import SelectedContactContext from "../context/selected-contact.contexts";
-import { getRandomColor } from "../../helpers";
 const { Text } = Typography;
 
 const ContactItem: React.FC<{

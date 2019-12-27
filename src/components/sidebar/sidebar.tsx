@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from "react";
 import "./sidebar.css";
-import { Row, Input, Tabs, Empty, Skeleton, Alert, notification } from "antd";
+import { Row, Input, Tabs, Empty, Skeleton, notification } from "antd";
 import ContactItem from "../contact-item/contact-item";
 import {useQuery} from 'react-apollo';
 import { GET_CONTACTS_QUERY } from "../../queries";
-import { Contact } from "../../models/contact";
+import { Contact } from "../../models/interfaces";
 import UserDetails from "../user-details/user-details";
 import ContactsContext from "../context/contacts.context";
 const { Search } = Input;
@@ -52,9 +52,6 @@ const Sidebar: React.FC = () => {
                 handleLoadingState()
                 }
             </div>
-          </TabPane>
-          <TabPane tab="Favorites" key="2">
-            Favorites tab 2
           </TabPane>
         </Tabs>
       </Row>

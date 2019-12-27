@@ -1,0 +1,28 @@
+.tag-container{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tag-item{
+    display: inline-block;
+    margin-right: 8px;
+    padding: 5px;
+    background-color: #f0f3f6;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tag-icon{
+    margin-left: 16px;
+    font-size: 8px;
+    background-color: white;
+    padding: 5px;
+    border-radius: 50%;
+    color: #03a9f4;
+}
+
+.tag-icon:hover{
+    background-color: #fafafa;
+}

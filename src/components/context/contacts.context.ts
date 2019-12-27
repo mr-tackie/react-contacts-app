@@ -1,5 +1,5 @@
 import React from 'react';
-import { Contact } from '../../models/contact';
+import { Contact } from '../../models/interfaces';
 
 
 const defaultState : { contacts: Contact[], setContacts: Function} = {

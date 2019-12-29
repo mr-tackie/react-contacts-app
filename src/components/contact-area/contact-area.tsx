@@ -249,6 +249,11 @@ const ContactArea: React.FC = () => {
   };
 
   const onNumberEdit = (number: PhoneNumber, new_number: string) => {
+    if(new_number === number.phone_number){
+      return;
+    }
+
+
     if(validatePhone(new_number)){
       updatePhoneNumber({
         variables: {
@@ -345,6 +350,11 @@ const ContactArea: React.FC = () => {
   };
 
   const onEmailEdit = (email: Email, new_email: string) => {
+    if(email.email === new_email){
+      return;
+    }
+
+    
     if(validateEmail(new_email)){
       updateEmail({
         variables: {

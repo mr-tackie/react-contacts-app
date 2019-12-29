@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
-import { Row, Col } from "antd";
+import { Row, Col, Spin } from "antd";
 import Sidebar from "./components/sidebar/sidebar";
 import ContactArea from "./components/contact-area/contact-area";
 import SelectedContactContext from "./components/context/context-provider";
@@ -15,11 +15,11 @@ import LandingPage from "./components/landing-page/landing-page";
 
 function App() {
   
-  const { isAuthenticated, loading, getIdTokenClaims } = useAuth0();
+  const { isAuthenticated, loading, getIdTokenClaims } : any = useAuth0();
   const [accessToken, setAccessToken] = useState("");
 
   if(loading){
-    return (<div>Loading...</div>)
+    return (<div className="fullscreen-loader"><Spin size="large"/></div>)
   }
 
   const getAccessToken = async () => {

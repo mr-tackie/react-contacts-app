@@ -1,6 +1,5 @@
 import React from "react";
 import "./landing-page.css";
-import "./contacts.svg"
 import { Card, Typography, Button } from "antd";
 import { useAuth0 } from "./../../react-auth0-spa";
 

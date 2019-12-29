@@ -3,25 +3,25 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import { ApolloClient } from "apollo-client";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { HttpLink } from "apollo-link-http";
-import { ApolloProvider } from "@apollo/react-hooks";
+import { Auth0Provider } from "./react-auth0-spa";
+import history from "./utils/history";
 
-const cache = new InMemoryCache();
-const link = new HttpLink({
-  uri: "https://nii-learns-graphql.herokuapp.com/v1/graphql"
-});
-
-const client = new ApolloClient({
-  cache,
-  link
-});
+const onRedirectCallback = (appState: any) => {
+  history.push(
+    appState && appState.targetUrl
+      ? appState.targetUrl
+      : window.location.pathname
+  );
+};
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
+  <Auth0Provider
+    domain="nii.auth0.com"
+    client_id="5CKK0oQW6utNG7aQLiwDrBUyiE0tSck6"
+    redirect_uri={window.location.origin}
+  >
     <App />
-  </ApolloProvider>,
+  </Auth0Provider>,
   document.getElementById("root")
 );
 

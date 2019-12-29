@@ -9,30 +9,55 @@ import {
   Icon,
   Input,
   Button,
-  notification
+  notification,
+  Popconfirm
 } from "antd";
 import SelectedContactContext from "../context/selected-contact.contexts";
 import { useMutation, useQuery } from "react-apollo";
-import { UPDATE_CONTACT, GET_CONTACTS_QUERY, GET_TWITTER } from "../../queries";
-import { Contact } from "../../models/interfaces";
+import {
+  UPDATE_CONTACT,
+  GET_CONTACTS_QUERY,
+  GET_TWITTER,
+  REMOVE_EMAIL,
+  REMOVE_PHONE_NUMBER,
+  ADD_PHONE_NUMBER,
+  UPDATE_PHONE_NUMBER,
+  ADD_EMAIL,
+  UPDATE_EMAIL
+} from "../../queries";
+import { Contact, PhoneNumber, Email } from "../../models/interfaces";
 import ContactsContext from "../context/contacts.context";
 import ContactHeader from "../contact-header/contact-header";
 import ContactCard from "../contact-card/contact-card";
 import ContactForm from "../contact-form/contact-form";
-const { Title, Paragraph } = Typography;
+import Fab from "../fab/fab";
+import { validateEmail, validatePhone } from "../../helpers";
+const { Title, Text } = Typography;
 
 const ContactArea: React.FC = () => {
   const { selectedContact, setContact } = useContext(SelectedContactContext);
 
   const { contacts } = React.useContext(ContactsContext);
 
-  //created local state to check if there was a change in data
+  //local state :: convert to class component. using too many hooks
   const [hasChanged, setHasChanged] = useState(false);
   const [trackedState, setTrackedState] = useState();
   const [twitterLink, setTwitterLink] = useState();
+  const [isAddingNumber, setIsAddingNumber] = useState(false);
+  const [isAddingEmail, setIsAddingEmail] = useState(false);
+  const [addNumber, setAddNumber] = useState();
+  const [addEmail, setAddEmail] = useState();
+  const [addEmailError, setAddEmailError] = useState();
+  const [addPhoneError, setAddPhoneError] = useState();
 
-  //mutation to update contact information
+  //mutations for basic CRUD
   const [updateUserMutation, { loading }] = useMutation(UPDATE_CONTACT);
+  const [removePhoneNumber] = useMutation(REMOVE_PHONE_NUMBER);
+  const [removeEmail] = useMutation(REMOVE_EMAIL);
+  const [addPhoneNumber, addPhoneNumberMutation] = useMutation(ADD_PHONE_NUMBER);
+  const [addEmailAddr, addEmailAddrMutation] = useMutation(ADD_EMAIL);
+  const [updatePhoneNumber] = useMutation(UPDATE_PHONE_NUMBER);
+  const [updateEmail] = useMutation(UPDATE_EMAIL);
 
   let unTrackedState: Contact | undefined;
 
@@ -49,7 +74,6 @@ const ContactArea: React.FC = () => {
 
     if (query.data) {
       setTwitterLink(query.data.get_twitter);
-      console.log(query.data);
     }
   }, [selectedContact, query]);
 
@@ -77,6 +101,18 @@ const ContactArea: React.FC = () => {
     }
 
     setTrackedState(newState);
+  };
+
+  const onEditInputChange = (e: ChangeEvent) => {
+    const target = e.target as HTMLInputElement;
+    const value: any = target.value;
+    const name = target.name;
+
+    if (name === "email") {
+      setAddEmail(value);
+    } else if (name === "phone") {
+      setAddNumber(value);
+    }
   };
 
   //reset input to original data
@@ -129,6 +165,260 @@ const ContactArea: React.FC = () => {
     });
   };
 
+  //add a phone number for the contact
+  const onPhoneAdd = () => {
+    setAddPhoneError(null);
+
+    if (selectedContact) {
+      if (!validatePhone(addNumber)) {
+        setAddPhoneError("Enter a valid phone number");
+      } else {
+        addPhoneNumber({
+          variables: {
+            contact_id: selectedContact?.id,
+            phone_number: addNumber
+          },
+          optimisticResponse: null,
+          update: (cache, { data }) => {
+            notification.open({
+              message: "Done",
+              description: "Phone number has been added"
+            });
+
+            const existingContacts: any = cache.readQuery({
+              query: GET_CONTACTS_QUERY
+            });
+            const newContacts = existingContacts.contacts.map(
+              (contact: Contact) => {
+                if (selectedContact && contact.id === selectedContact.id) {
+                  const phone_number = data.insert_phone_numbers.returning[0];
+                  contact.phone_numbers = [
+                    ...contact.phone_numbers,
+                    {
+                      __typename: 'phone_numbers_insert_input',
+                      id: phone_number.id,
+                      phone_number: phone_number.phone_number,
+                      contact_id: phone_number.contact_id
+                    }
+                  ];
+                  setContact(contact);
+                }
+                setIsAddingNumber(false);
+                return contact;
+              }
+            );
+            cache.writeQuery({
+              query: GET_CONTACTS_QUERY,
+              data: { contacts: newContacts }
+            });
+          }
+        });
+      }
+    }
+  };
+
+  //delete a phone number
+  const onNumberDelete = (id: number | undefined) => {
+    if (id) {
+      removePhoneNumber({
+        variables: { id: id },
+        optimisticResponse: null,
+        update: cache => {
+          const existingContacts: any = cache.readQuery({
+            query: GET_CONTACTS_QUERY
+          });
+          const newContacts = existingContacts.contacts.map(
+            (contact: Contact) => {
+              if (selectedContact && contact.id === selectedContact.id) {
+                contact.phone_numbers = contact.phone_numbers.filter(
+                  phone_number => phone_number.id !== id
+                );
+
+                setContact(contact);
+              }
+              return contact;
+            }
+          );
+          cache.writeQuery({
+            query: GET_CONTACTS_QUERY,
+            data: { contacts: newContacts }
+          });
+        }
+      });
+    }
+  };
+
+  const onNumberEdit = (number: PhoneNumber, new_number: string) => {
+    if(validatePhone(new_number)){
+      updatePhoneNumber({
+        variables: {
+          id: number.id,
+          phone_number: new_number
+        },
+        optimisticResponse: null,
+        update: cache => {
+            notification.success({
+              message: "Phone number edited",
+            });
+
+            const existingContacts: any = cache.readQuery({
+              query: GET_CONTACTS_QUERY
+            });
+            const newContacts = existingContacts.contacts.map(
+              (contact: Contact) => {
+                if (selectedContact && contact.id === selectedContact.id) {
+                  contact.phone_numbers.map((phone_number: PhoneNumber) => {
+                    if(phone_number.id === number.id){
+                      phone_number.phone_number = new_number
+                    }
+
+                    return phone_number;
+                  });
+                  setContact(contact);
+                }
+                return contact;
+              }
+            );
+            cache.writeQuery({
+              query: GET_CONTACTS_QUERY,
+              data: { contacts: newContacts }
+            });
+          }
+      })
+    }else{
+      notification.error({
+        message: 'Invalid phone number provided',
+        placement: "bottomRight",
+        duration: 1.5,
+     })
+    }
+  };
+
+  const onEmailAdd = () => {
+    setAddEmailError(null);
+
+    if (selectedContact) {
+      if (!validateEmail(addEmail)) {
+        setAddEmailError("Enter a valid phone number");
+      } else {
+        addEmailAddr({
+          variables: {
+            contact_id: selectedContact?.id,
+            email: addEmail
+          },
+          optimisticResponse: null,
+          update: (cache, { data }) => {
+            notification.open({
+              message: "Done",
+              description: "Phone number has been added"
+            });
+
+            const existingContacts: any = cache.readQuery({
+              query: GET_CONTACTS_QUERY
+            });
+            const newContacts = existingContacts.contacts.map(
+              (contact: Contact) => {
+                if (selectedContact && contact.id === selectedContact.id) {
+                  const email = data.insert_emails.returning[0];
+                  contact.emails = [
+                    ...contact.emails,
+                    {
+                      __typename: 'emails_insert_input',
+                      id: email.id,
+                      email: email.email
+                    }
+                  ];
+                  setContact(contact);
+                }
+                setIsAddingEmail(false);
+                return contact;
+              }
+            );
+            cache.writeQuery({
+              query: GET_CONTACTS_QUERY,
+              data: { contacts: newContacts }
+            });
+          }
+        });
+      }
+    }
+  };
+
+  const onEmailEdit = (email: Email, new_email: string) => {
+    if(validateEmail(new_email)){
+      updateEmail({
+        variables: {
+          id: email.id,
+          email: new_email
+        },
+        optimisticResponse: null,
+        update: cache => {
+            notification.success({
+              message: "Email address updated",
+            });
+
+            const existingContacts: any = cache.readQuery({
+              query: GET_CONTACTS_QUERY
+            });
+            const newContacts = existingContacts.contacts.map(
+              (contact: Contact) => {
+                if (selectedContact && contact.id === selectedContact.id) {
+                  contact.emails.map((email_addr: Email) => {
+                    if(email.id === email_addr.id){
+                      email_addr.email = new_email
+                    }
+
+                    return email_addr;
+                  });
+                  setContact(contact);
+                }
+                return contact;
+              }
+            );
+            cache.writeQuery({
+              query: GET_CONTACTS_QUERY,
+              data: { contacts: newContacts }
+            });
+          }
+      })
+    }else{
+      notification.error({
+        message: 'Invalid email address provided',
+        placement: "bottomRight",
+        duration: 1.5,
+     })
+    }
+  }
+
+  //delete an email
+  const onEmailDelete = (id: number | undefined) => {
+    if (id) {
+      removeEmail({
+        variables: { id: id },
+        optimisticResponse: null,
+        update: cache => {
+          const existingContacts: any = cache.readQuery({
+            query: GET_CONTACTS_QUERY
+          });
+          const newContacts = existingContacts.contacts.map(
+            (contact: Contact) => {
+              if (selectedContact && contact.id === selectedContact.id) {
+                contact.emails = contact.emails.filter(
+                  email => email.id !== id
+                );
+              }
+              return contact;
+            }
+          );
+          cache.writeQuery({
+            query: GET_CONTACTS_QUERY,
+            data: { contacts: newContacts }
+          });
+        }
+      });
+    }
+  };
+
   //render items based on condition
   const renderItems = () => {
     return (
@@ -136,7 +426,7 @@ const ContactArea: React.FC = () => {
         <ContactHeader twitterLink={twitterLink} />
         <div className="main-content-body">
           {selectedContact && trackedState ? (
-            <div>
+            <div className="contact-details-area">
               <Row gutter={20}>
                 <Col span={8}>
                   <Title level={4}>Contact Info</Title>
@@ -204,19 +494,69 @@ const ContactArea: React.FC = () => {
                     headStyle={{ backgroundColor: "#fafafa" }}
                     actions={[
                       <Icon
-                        type="plus"
+                        type={isAddingNumber ? "close" : "plus"}
                         key="phone_add"
-                        onClick={() =>
-                          alert("You wanna add some bitch ass number")
-                        }
+                        onClick={() => setIsAddingNumber(!isAddingNumber)}
                       ></Icon>
                     ]}
                   >
                     {selectedContact.phone_numbers.map((item, index) => {
                       return (
-                        <Paragraph key={index}>{item.phone_number}</Paragraph>
+                        <div className="deletable-item" key={index}>
+                          <div style={{ width: "90%" }}>
+                            <Text
+                              editable={{ onChange: (val: string) => onNumberEdit(item, val) }}
+                              className="deletable-text"
+                            >
+                              {item.phone_number}
+                            </Text>
+                          </div>
+                          {selectedContact.phone_numbers.length > 1 ? (
+                            <Popconfirm
+                              placement="rightBottom"
+                              title="Are you sure you want to remove this phone number?"
+                              onConfirm={() => onNumberDelete(item.id)}
+                              okText="Yes"
+                              cancelText="No"
+                            >
+                              <Button
+                                icon="delete"
+                                type="danger"
+                                shape="circle"
+                                size="small"
+                              />
+                            </Popconfirm>
+                          ) : null}
+                        </div>
                       );
                     })}
+                    {isAddingNumber ? (
+                      <div className="custom-input-field">
+                        <label>Phone</label>
+                        <Row>
+                          <Col span={20}>
+                            <Input
+                              className="custom-input"
+                              value={addNumber}
+                              name="phone"
+                              onChange={onEditInputChange}
+                            />
+                          </Col>
+                          <Button
+                            type="ghost"
+                            icon="check"
+                            style={{ float: "right" }}
+                            loading={addPhoneNumberMutation.loading}
+                            onClick={onPhoneAdd}
+                          />
+                        </Row>
+                        {addPhoneError ? (
+                          <Text type="danger">
+                            <i>{addPhoneError}</i>
+                          </Text>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </Card>
                 </Col>
                 <Col span={8}>
@@ -225,17 +565,64 @@ const ContactArea: React.FC = () => {
                     headStyle={{ backgroundColor: "#fafafa" }}
                     actions={[
                       <Icon
-                        type="plus"
+                        type={isAddingEmail ? "close" : "plus"}
                         key="email_add"
-                        onClick={() =>
-                          alert("You wanna add some bitch ass email")
-                        }
+                        onClick={() => setIsAddingEmail(!isAddingEmail)}
                       ></Icon>
                     ]}
                   >
                     {selectedContact.emails.map((item, index) => {
-                      return <Paragraph key={index}>{item.email}</Paragraph>;
+                      return (
+                        <div className="deletable-item" key={index}>
+                          <Text editable={{onChange: (val) => onEmailEdit(item, val)}} className="deletable-text">
+                            {item.email}
+                          </Text>
+                          {selectedContact.emails.length > 1 ? (
+                            <Popconfirm
+                              placement="rightBottom"
+                              title="Are you sure you want to remove this email address?"
+                              onConfirm={() => onEmailDelete(item.id)}
+                              okText="Yes"
+                              cancelText="No"
+                            >
+                              <Button
+                                icon="delete"
+                                type="danger"
+                                shape="circle"
+                                size="small"
+                              />
+                            </Popconfirm>
+                          ) : null}
+                        </div>
+                      );
                     })}
+                    {isAddingEmail ? (
+                      <div className="custom-input-field">
+                        <label>Email</label>
+                        <Row>
+                          <Col span={20}>
+                            <Input
+                              className="custom-input"
+                              value={addEmail}
+                              name="email"
+                              onChange={onEditInputChange}
+                            />
+                          </Col>
+                          <Button
+                            type="ghost"
+                            icon="check"
+                            style={{ float: "right" }}
+                            onClick={onEmailAdd}
+                            loading={addEmailAddrMutation.loading}
+                          />
+                        </Row>
+                        {addPhoneError ? (
+                          <Text type="danger">
+                            <i>{addEmailError}</i>
+                          </Text>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </Card>
                 </Col>
               </Row>
@@ -244,6 +631,15 @@ const ContactArea: React.FC = () => {
             <ContactForm />
           )}
         </div>
+        {selectedContact ? (
+          <Fab
+            icon="user-add"
+            onClick={() => setContact(null)}
+            tooltipText="Add new contact"
+          />
+        ) : (
+          ""
+        )}
       </div>
     );
   };

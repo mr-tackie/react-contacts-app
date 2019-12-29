@@ -1,0 +1,28 @@
+.hero-main{
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.subtitle{
+    font-weight: 600;
+    font-size: 18px;
+    width: 400px;
+}
+
+.hero-content-card{
+    margin:8px;
+}
+
+.signup-button{
+    background-color: #20b46c;
+    margin-left: 10px;
+    border: none;
+    color: white;
+}

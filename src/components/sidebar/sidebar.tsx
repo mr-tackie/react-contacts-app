@@ -12,7 +12,7 @@ const { TabPane } = Tabs;
 
 const Sidebar: React.FC = () => {
   const {data, loading, error} = useQuery(GET_CONTACTS_QUERY);
-  const {contacts, setContacts} = useContext(ContactsContext)
+  const {contacts, setContacts} = useContext(ContactsContext);
 
   const handleLoadingState = () => {
       if(loading){
@@ -29,7 +29,7 @@ const Sidebar: React.FC = () => {
         notification.error({
           message: 'Error',
           description: 'There was a problem fetching contacts'
-        })
+        });
       }
   }
 

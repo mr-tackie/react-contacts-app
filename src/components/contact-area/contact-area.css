@@ -1,5 +1,5 @@
 .main-content-header{
-    height: 100px;
+    min-height: 100px;
     padding: 20px;
     background-color: #dddddd;
     display: flex;
@@ -20,6 +20,9 @@
 
 .main-content-body{
     padding: 20px;
+    height: 100%;
+    position: relative;
+    overflow: auto;
 }
 
 .main-content-contact-details{
@@ -61,4 +64,16 @@
     float: right;
     margin-top: 16px;
     margin-left: 4px;
+}
+
+.deletable-item{
+    background-color: #f0f3f6;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.deletable-text{
+    width: 90%;
 }

@@ -42,7 +42,7 @@ const ContactCard: React.FC<{
       </Text>
       <Text>
         <Icon type="twitter"></Icon>{" "}
-        {!selectedContact || selectedContact.twitter === "" || !twitterLink ? (
+        {!selectedContact || selectedContact.twitter === "" ? (
           "N/A"
         ) : (
           <a

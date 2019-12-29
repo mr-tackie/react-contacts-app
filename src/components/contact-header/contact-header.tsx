@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
-import { Row, Col, Popover, Typography, Popconfirm } from "antd";
+import { Row, Col, Typography, Popconfirm, Tooltip } from "antd";
 import IconButton from "../icon-button/icon-button";
 import SelectedContactContext from "../context/selected-contact.contexts";
 import { useMutation } from "react-apollo";
 import { REMOVE_CONTACT, GET_CONTACTS_QUERY } from "../../queries";
 import { Contact } from "../../models/interfaces";
+
 const { Title, Text } = Typography;
 
 const ContactHeader: React.FC<{
@@ -61,7 +62,7 @@ const ContactHeader: React.FC<{
                 <IconButton icon="delete" color="red" loading={loading} />
               </Popconfirm>
               {twitterLink ? (
-                <Popover content={selectedContact.twitter} placement="bottom">
+                <Tooltip placement="top" title={selectedContact.twitter}>
                   <a
                     href={twitterLink != null ? twitterLink : "#"}
                     rel="noopener noreferrer"
@@ -69,7 +70,7 @@ const ContactHeader: React.FC<{
                   >
                     <IconButton icon="twitter" color="#00aced" />
                   </a>
-                </Popover>
+                </Tooltip>
               ) : (
                 ""
               )}

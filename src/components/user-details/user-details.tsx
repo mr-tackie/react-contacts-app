@@ -1,28 +1,29 @@
 import React from "react";
-import { Row, Col, Typography } from "antd";
+import { Row, Col, Typography, Avatar } from "antd";
 import LetterAvatar from "../letter-avatar/letter-avatar";
 import IconButton from "../icon-button/icon-button";
+import { useAuth0 } from "../../react-auth0-spa";
 const { Title, Text } = Typography;
 
-class UserDetails extends React.Component {
-  render() {
+const  UserDetails : React.FC = () => {
+  const { logout, user } = useAuth0();
+  
     return (
       <Row>
         <Col span={24} className="user-details-container">
           <div className="user-details">
-            <LetterAvatar name="John Doe" size="large" />
+            {!user.picture ? <LetterAvatar name="John Doe" size="large" /> : <Avatar size="large" src={user.picture}/>}
             <div className="header-name">
               <Title className="header-name__name" level={3}>
-                John Doe
+                {user.name}
               </Title>
-              <Text className="header-name__email">johndoe@gmail.com</Text>
+              <Text className="header-name__email">{user.nickname}</Text>
             </div>
           </div>
-          <IconButton icon="logout" color="#2196F3" />
+          <IconButton icon="logout" onClick = {() => logout()} color="#2196F3" />
         </Col>
       </Row>
     );
-  }
 }
 
 export default UserDetails;

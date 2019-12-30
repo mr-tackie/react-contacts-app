@@ -18,20 +18,15 @@ const Sidebar: React.FC = () => {
 
   const handleSearch = (e: ChangeEvent) => {
     const { value } = e.target as HTMLInputElement;
-    console.log(value);
     if (value === "") {
       setHasSearched(false);
     } else {
-      const results = contacts.filter((contact: Contact) => {
-        if (
+      const results = contacts.filter(
+        (contact: Contact) =>
           (contact.first_name + " " + contact.last_name)
             .toLowerCase()
             .search(value.toLowerCase()) !== -1
-        ) {
-          return contact;
-        }
-      });
-      console.log(results);
+      );
       setHasSearched(true);
       setSearchResults(results);
     }

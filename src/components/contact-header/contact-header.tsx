@@ -55,7 +55,7 @@ const ContactHeader: React.FC<{
               <Popconfirm
                 placement="rightBottom"
                 title="Are you sure you want to delete this contact?"
-                onConfirm={_handleDelete}
+                onConfirm={() => _handleDelete()}
                 okText="Yes"
                 cancelText="No"
               >

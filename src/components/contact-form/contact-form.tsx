@@ -57,31 +57,32 @@ class ContactForm extends Component {
     this.setState({ contact: { ...this.state.contact, [name]: value } });
   };
 
-  onEmailAdd = (e: ChangeEvent) => {
+  onEmailInputChange = (e: ChangeEvent) => {
+    const { value } = e.target as HTMLInputElement;
+    this.setState({ emailValue: value });
+  };
+
+  onEmailAdd = (e: any) => {
     this.setState({ emailError: null });
     const { value } = e.target as HTMLInputElement;
     const { contact } = this.state;
 
-    if (value.slice(-1) === ",") {
-      const email = value.slice(0, -1);
-      if (!validateEmail(email)) {
-        this.setState({ emailError: "Enter a valid email" });
-      } else if (contact.emails !== null && _.find(contact.emails, { email })) {
-        this.setState({ emailError: "You have already entered this email" });
-      } else {
-        this.setState({
-          contact: {
-            ...contact,
-            emails:
-              contact.emails !== undefined || contact.emails != null
-                ? [...contact.emails, { email }]
-                : [{ email }]
-          },
-          emailValue: ""
-        });
-      }
+    const email = value;
+    if (!validateEmail(email)) {
+      this.setState({ emailError: "Enter a valid email" });
+    } else if (contact.emails !== null && _.find(contact.emails, { email })) {
+      this.setState({ emailError: "You have already entered this email" });
     } else {
-      this.setState({ emailValue: value });
+      this.setState({
+        contact: {
+          ...contact,
+          emails:
+            contact.emails !== undefined || contact.emails != null
+              ? [...contact.emails, { email }]
+              : [{ email }]
+        },
+        emailValue: ""
+      });
     }
   };
 
@@ -93,37 +94,37 @@ class ContactForm extends Component {
     }
   };
 
-  onPhoneNumberAdd = (e: ChangeEvent) => {
+  onPhoneInputChange = (e: ChangeEvent) => {
+    const { value } = e.target as HTMLInputElement;
+    this.setState({ phoneValue: value });
+  };
+
+  onPhoneNumberAdd = (e: any) => {
     this.setState({ phonError: null });
     const { value } = e.target as HTMLInputElement;
     const { contact } = this.state;
 
-    if (value.slice(-1) === ",") {
-      const phone_number = value.slice(0, -1);
-      if (!validatePhone(phone_number)) {
-        this.setState({ phonError: "Enter a valid phone number" });
-      } else if (
-        contact.phone_numbers !== null &&
-        _.find(contact.phone_numbers, { phone_number })
-      ) {
-        this.setState({
-          phonError: "You have already entered this phone number"
-        });
-      } else {
-        this.setState({
-          contact: {
-            ...contact,
-            phone_numbers:
-              contact.phone_numbers !== undefined ||
-              contact.phone_numbers != null
-                ? [...contact.phone_numbers, { phone_number }]
-                : [{ phone_number }]
-          },
-          phoneValue: ""
-        });
-      }
+    const phone_number = value;
+    if (!validatePhone(phone_number)) {
+      this.setState({ phonError: "Enter a valid phone number" });
+    } else if (
+      contact.phone_numbers !== null &&
+      _.find(contact.phone_numbers, { phone_number })
+    ) {
+      this.setState({
+        phonError: "You have already entered this phone number"
+      });
     } else {
-      this.setState({ phoneValue: value });
+      this.setState({
+        contact: {
+          ...contact,
+          phone_numbers:
+            contact.phone_numbers !== undefined || contact.phone_numbers != null
+              ? [...contact.phone_numbers, { phone_number }]
+              : [{ phone_number }]
+        },
+        phoneValue: ""
+      });
     }
   };
 
@@ -228,7 +229,9 @@ class ContactForm extends Component {
             <Card title="Fill this form to add a contact">
               <Row gutter={10}>
                 <Col span={8} className="custom-input-field">
-                  <label>First name <Text type="danger">*</Text></label>
+                  <label>
+                    First name <Text type="danger">*</Text>
+                  </label>
                   <Input
                     className="custom-input"
                     name="first_name"
@@ -240,7 +243,9 @@ class ContactForm extends Component {
                   </Text>
                 </Col>
                 <Col span={8} className="custom-input-field mb-3">
-                  <label>Last name <Text type="danger">*</Text></label>
+                  <label>
+                    Last name <Text type="danger">*</Text>
+                  </label>
                   <Input
                     className="custom-input"
                     name="last_name"
@@ -263,29 +268,37 @@ class ContactForm extends Component {
               </Row>
               <Row gutter={10}>
                 <Col span={12} className="custom-input-field">
-                  <label>Phone Numbers <Text type="danger">*</Text></label>
+                  <label>
+                    Phone Numbers <Text type="danger">*</Text>
+                  </label>
                   <div className="tag-container">
-                    {contact.phone_numbers && contact.phone_numbers.length > 0
-                      ? contact.phone_numbers.map((contact, index) => (
-                          <div key={index} className="tag-item">
-                            <Text>{contact.phone_number}</Text>
-                            <Icon
-                              type="close"
-                              className="tag-icon"
-                              onClick={() => this.onPhoneNumberDelete(index)}
-                            />
-                          </div>
-                        ))
-                      : <Button disabled type="dashed">No numbers added</Button>}
+                    {contact.phone_numbers &&
+                    contact.phone_numbers.length > 0 ? (
+                      contact.phone_numbers.map((contact, index) => (
+                        <div key={index} className="tag-item">
+                          <Text>{contact.phone_number}</Text>
+                          <Icon
+                            type="close"
+                            className="tag-icon"
+                            onClick={() => this.onPhoneNumberDelete(index)}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <Button disabled type="dashed">
+                        No numbers added
+                      </Button>
+                    )}
                   </div>
                   <Input
                     className="custom-input"
-                    onChange={event => this.onPhoneNumberAdd(event)}
+                    onChange={event => this.onPhoneInputChange(event)}
                     value={phoneValue}
+                    onPressEnter={event => this.onPhoneNumberAdd(event)}
                   />
                   {!phonError ? (
                     <Text type="secondary">
-                      <i>(Enter a number and press comma to add)</i>
+                      <i>(Enter a number and hit Enter to add)</i>
                     </Text>
                   ) : (
                     <Text type="danger">
@@ -294,29 +307,36 @@ class ContactForm extends Component {
                   )}
                 </Col>
                 <Col span={12} className="custom-input-field">
-                  <label>Emails <Text type="danger">*</Text></label>
+                  <label>
+                    Emails <Text type="danger">*</Text>
+                  </label>
                   <div className="tag-container">
-                    {contact.emails && contact.emails.length > 0
-                      ? contact.emails.map((contact, index) => (
-                          <div key={index} className="tag-item">
-                            <Text>{contact.email}</Text>
-                            <Icon
-                              type="close"
-                              className="tag-icon"
-                              onClick={() => this.onEmailDelete(index)}
-                            />
-                          </div>
-                        ))
-                      :  <Button disabled type="dashed">No emails added</Button>}
+                    {contact.emails && contact.emails.length > 0 ? (
+                      contact.emails.map((contact, index) => (
+                        <div key={index} className="tag-item">
+                          <Text>{contact.email}</Text>
+                          <Icon
+                            type="close"
+                            className="tag-icon"
+                            onClick={() => this.onEmailDelete(index)}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <Button disabled type="dashed">
+                        No emails added
+                      </Button>
+                    )}
                   </div>
                   <Input
                     className="custom-input"
-                    onChange={event => this.onEmailAdd(event)}
+                    onChange={event => this.onEmailInputChange(event)}
                     value={emailValue}
+                    onPressEnter={event => this.onEmailAdd(event)}
                   />
                   {!emailError ? (
                     <Text type="secondary">
-                      <i>(Enter an email and press comma to add)</i>
+                      <i>(Enter an email and hit Enter to add)</i>
                     </Text>
                   ) : (
                     <Text type="danger">
